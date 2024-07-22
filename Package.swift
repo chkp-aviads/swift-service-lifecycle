@@ -1,4 +1,4 @@
-// swift-tools-version:5.0
+// swift-tools-version:5.9
 
 import PackageDescription
 
@@ -12,26 +12,19 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-log.git", from: "1.0.0"),
         .package(url: "https://github.com/apple/swift-metrics.git", "1.0.0" ..< "3.0.0"),
         .package(url: "https://github.com/swift-server/swift-backtrace.git", from: "1.1.1"),
-        .package(url: "https://github.com/apple/swift-nio.git", from: "2.0.0"), // used in tests
+        .package(url: "https://github.com/apple/swift-atomics.git", from: "1.0.0"),
+        .package(url: "https://github.com/chkp-aviads/swift-nio.git", branch: "main")
     ],
-    targets: []
+    targets: [
+        .target(name: "Lifecycle",
+                dependencies: [
+                    .product(name: "Logging", package: "swift-log"),
+                    .product(name: "Metrics", package: "swift-metrics"),
+                    .product(name: "Backtrace", package: "swift-backtrace"),
+                    .product(name: "Atomics", package: "swift-atomics")
+                ]),
+        .target(name: "LifecycleNIOCompat", dependencies: ["Lifecycle",
+                                                           .product(name: "NIO", package: "swift-nio")]),
+        .testTarget(name: "LifecycleTests", dependencies: ["Lifecycle", "LifecycleNIOCompat"]),
+    ]
 )
-
-#if compiler(>=5.3)
-package.dependencies += [
-    .package(url: "https://github.com/apple/swift-atomics.git", from: "1.0.0"),
-]
-package.targets += [
-    .target(name: "Lifecycle", dependencies: ["Logging", "Metrics", "Backtrace", "Atomics"]),
-]
-#else
-package.targets += [
-    .target(name: "CLifecycleHelpers", dependencies: []),
-    .target(name: "Lifecycle", dependencies: ["CLifecycleHelpers", "Logging", "Metrics", "Backtrace"]),
-]
-#endif
-
-package.targets += [
-    .target(name: "LifecycleNIOCompat", dependencies: ["Lifecycle", "NIO"]),
-    .testTarget(name: "LifecycleTests", dependencies: ["Lifecycle", "LifecycleNIOCompat"]),
-]
