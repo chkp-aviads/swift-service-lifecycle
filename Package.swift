@@ -13,7 +13,7 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-metrics.git", "1.0.0" ..< "3.0.0"),
         .package(url: "https://github.com/swift-server/swift-backtrace.git", from: "1.1.1"),
         .package(url: "https://github.com/apple/swift-atomics.git", from: "1.0.0"),
-        .package(url: "https://github.com/chkp-aviads/swift-nio.git", branch: "main")
+        .package(url: "https://github.com/chkp-aviads/swift-nio.git", from: "2.82.0"),
     ],
     targets: [
         .target(name: "Lifecycle",
